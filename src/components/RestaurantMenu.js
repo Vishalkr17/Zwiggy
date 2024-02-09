@@ -1,32 +1,35 @@
-
 import useRestaurantMenu from "../utils/useRestaurantMenu";
+import RestaurantCategory from "./RestaurantCategory";
 import Shimmer from "./shimmer";
 import { useParams } from "react-router-dom";
 
 const RestaurantMenu = () => {
+  const { resId } = useParams();
+  const resInfo = useRestaurantMenu(resId); // Custom Hook
 
-    const { resId } = useParams()
-    const resInfo = useRestaurantMenu(resId) // Custom Hook
+  if (resInfo === null) return <Shimmer />;
 
-    if(resInfo === null) return <Shimmer />
+  const { name, cuisines, costForTwoMessage } =
+    resInfo?.cards[0]?.card?.card?.info;
+  const { itemCards } =
+    resInfo?.cards[2]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card?.card;
     
-    const { name, cuisines, costForTwoMessage } = resInfo?.cards[0]?.card?.card?.info;
-    const { itemCards } = resInfo?.cards[2]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card?.card
+    const categories = resInfo?.cards[2]?.groupedCard?.cardGroupMap?.REGULAR?.cards.filter((c) => c.card?.card?.["@type"] === "type.googleapis.com/swiggy.presentation.food.v2.ItemCategory"
+    );
 
-
-    return (
-        <div className="menu"> 
-            <h1>{name}</h1>
-            <p>{cuisines.join(', ')} - {costForTwoMessage}</p>
-            <h2>Menu</h2>
-            <ul>
-                {itemCards.map((item) => <li key={item.card.info.id}>
-                    <p>{item.card.info.name}</p>
-                    <p>₹{(item.card.info.price/100 || item.card.info.defaultPrice/100)}</p>
-                </li>)}
-            </ul>
-        </div>
-    )
-}
+  return (
+    <div className="mt-24">
+      <div className="w-8/12 mx-auto my-2 p-4 text-left">
+        <h1 className="text-3xl font-semibold mb-2">{name}</h1>
+        <p className="text-gray-500 text-sm mb-4">
+          {cuisines.join(", ")} - {costForTwoMessage}
+        </p>
+      </div>
+      {categories.map((category)=>(
+        <RestaurantCategory key={category?.card?.card?.name} data={category?.card?.card} />
+      ))}
+    </div>
+  );
+};
 
 export default RestaurantMenu;
