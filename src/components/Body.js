@@ -1,14 +1,17 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Shimmer from "./shimmer";
 import RestaurantCard, { RestaurantCardPromoted } from "./RestaurantCard";
 import { Link } from "react-router-dom";
 import useOnlineStatus from "../utils/useOnlineStatus";
+import UserContext from "../utils/UserContext";
 
 const Body = () => {
   const [listOfRestaurants, setListOfRestaurants] = useState([]);
   const [filterListOfRestaurants, setfilterListOfRestaurants] = useState([]);
   const [searchText, setSearchText] = useState("");
   const onlineStatus = useOnlineStatus();
+
+  const { loggedInUser, setUserName } = useContext(UserContext)
 
   useEffect(() => {
     fetchData();
@@ -39,7 +42,7 @@ const Body = () => {
             <button 
               onClick={() => {
                 const filteredList = listOfRestaurants.filter(
-                  (res) => res.info.avgRating > 4.2
+                  (res) => res.info.avgRating > 4.0
                 );
                 setfilterListOfRestaurants(filteredList);
               }}
@@ -71,7 +74,22 @@ const Body = () => {
               🔎
             </button>
           </div>
+              
+          <div className="mt-20 flex space-x-4 items-center">
+              <label>Username:</label>
+              <input
+              type="text"
+              placeholder="Name ..."
+              value={loggedInUser}
+              onChange={(e) => setUserName(e.target.value)}
+              className="p-2 border rounded-lg bg-white"
+            />
+
         </div>
+
+        </div>
+        
+        
 
         <div className="flex flex-wrap justify-center">
           {filterListOfRestaurants.map((restaurant) => (
